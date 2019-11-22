@@ -1,6 +1,3 @@
-env /tmp/share/mysql.env
-
 mysql -uroot -p"{{ ROOT_PASS }}" -e "STOP SLAVE"
-mysql -uroot -p"{{ ROOT_PASS }}" -e "CHANGE MASTER TO MASTER_HOST='{{ container_1_ip }}',MASTER_USER='replicauser', MASTER_PASSWORD='replicapass', MASTER_LOG_FILE='$MASTER_LOG_FILE', MASTER_LOG_POS= $MASTER_LOG_POS"
+mysql -uroot -p"{{ ROOT_PASS }}" -e "CHANGE MASTER TO MASTER_HOST='{{ container_1_ip }}',MASTER_USER='replicauser', MASTER_PASSWORD='replicapass', MASTER_LOG_FILE='$MAS_LOG_FILE', MASTER_LOG_POS=$MAS_LOG_POS"
 mysql -uroot -p"{{ ROOT_PASS }}" -e "START SLAVE"
-

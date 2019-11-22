@@ -1,0 +1,8 @@
+bash /tmp/share/mysql.sh
+
+echo "MASTER_LOG_FIILE=$MASTER_LOG_FILE"
+echo "MASTER_LOG_POS=$MASTER_LOG_POS"
+mysql -uroot -p"{{ ROOT_PASS }}" -e "STOP SLAVE"
+mysql -uroot -p"{{ ROOT_PASS }}" -e "CHANGE MASTER TO MASTER_HOST='{{ container_1_ip }}',MASTER_USER='replicauser', MASTER_PASSWORD='replicapass', MASTER_LOG_FILE=$MASTER_LOG_FILE, MASTER_LOG_POS=$MASTER_LOG_POS"
+mysql -uroot -p"{{ ROOT_PASS }}" -e "START SLAVE"
+

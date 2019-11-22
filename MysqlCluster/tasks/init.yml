@@ -19,8 +19,6 @@
   template: src=setslave.sh.j2 dest=/tmp/setslave.sh
 
 
-- name: copy getlogfile and getlogpos script
-  copy: src=getfilepos.sh dest=/tmp/getfilepos.sh
 
 
 # Network
@@ -47,16 +45,30 @@
       - /tmp/my.cnf-{{ master_name }}:/etc/mysql/my.cnf
       - /home/ansible/mysql-master:/var/lib/mysql
       - /tmp/setmaster.sh:/tmp/setmaster.sh
-      - share:/tmp/share
-      - /tmp/getfilepos.sh:/tmp/getfilepos.sh
 
-        # shell: "sh /tmp/setmaster.sh"
-        #shell: "cat master_status.txt | awk '{print $1}'"
-        #register: mas_log_file
-        #shell: "cat master_status.txt | awk '{print $2}'"
-        #register: pos_log_file
-        # command: ["docker","exec","my-master","sh","/tmp/setmaster.sh"]
-    
+#Pause to start mysql
+- pause:
+    seconds: 10
+
+- name: execute set master scripts
+  shell: |
+    docker exec {{ master_name }} bash /tmp/setmaster.sh
+      
+- name: Getting the master log file from the master node
+  command: docker exec -it {{ master_name }} bash -c "cat /master_status.txt | awk '{print $1}'" 
+  register: LOG_FILE
+
+- debug:
+    var: LOG_FILE.stdout
+
+- name: Getting the masterlog  position  from the master node
+  command: docker exec -it {{ master_name }} bash -c "cat /master_status.txt | awk '{print $2}'"
+  register: LOG_POS
+
+- debug:
+    var: LOG_POS.stdout
+
+ 
 - name: Start Mysql Slave container
   docker_container:
     name: "{{ slave_name }}"
@@ -69,20 +81,17 @@
         ipv4_address: "{{ container_2_ip }}"
     env:
        MYSQL_ROOT_PASSWORD: "{{ ROOT_PASS }}"
+       MAS_LOG_FILE: "{{ LOG_FILE.stdout }}"
+       MAS_LOG_POS: "{{ LOG_POS.stdout }}"
     volumes:
       - /tmp/my.cnf-{{ slave_name }}:/etc/mysql/my.cnf
       - /home/ansible/mysql-slave:/var/lib/mysql
-      - share:/tmp/share
       - /tmp/setslave.sh:/tmp/setslave.sh
 
-#- name: Run Master script
-#  docker_container:
-#    name: "{{ master_name }}"
-#    command: ["sh","/tmp/setmaster.sh"]
-#  ignore_errors: yes
+# Pause to start mysql
+- pause:
+     seconds: 10
 
 - name: execute sql scripts
   shell: |
-    docker exec {{ master_name }} bash /tmp/setmaster.sh
-    docker exec {{ master_name }} bash /tmp/getfilepos.sh
     docker exec {{ slave_name }} bash /tmp/setslave.sh
