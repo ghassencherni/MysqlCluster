@@ -1,0 +1,21 @@
+---
+- name: Delete Mysql containers
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  ignore_errors: yes
+  with_items:
+     - "{{ master_name }}"
+     - "{{ slave_name }}"
+
+- name: Delete Mysql bridge
+  docker_network:
+    name: "{{ bridge_name }}"
+    state: absent
+    force: yes
+  ignore_errors: yes
+
+- name: Remove share volume
+  docker_volume:
+    name: share
+    state: absent

@@ -1,0 +1,20 @@
+---
+# defaults file for RedisCluster
+
+
+
+#Bridge network configuration
+bridge_name: "mysql_bridge"
+bridge_subnet: "172.20.0.0/16"
+bridge_gateway: "172.20.0.1"
+
+#Containers network configuration
+container_1_ip: "172.20.0.2"  # the master
+container_2_ip: "172.20.0.3"  # the slave
+
+#Containers names ( used as tag for templates )
+master_name: "my-master"
+slave_name: "my-slave"
+
+
+ROOT_PASS: "ghassen"

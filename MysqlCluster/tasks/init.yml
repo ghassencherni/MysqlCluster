@@ -1,0 +1,88 @@
+---
+
+# Create the share volume ( used to exchange MYSQL vars between Slave and Master )
+- name: Create share volume
+  docker_volume:
+    name: share
+    
+# Create configuration files
+- name: my.cnf file
+  template: src=my.cnf.j2  dest=/tmp/my.cnf-{{ item.name }}
+  with_items:
+    - { server_id: "1", name: "{{ master_name }}", ip: "{{ container_1_ip }}" }
+    - { server_id: "2", name: "{{ slave_name }}", ip: "{{ container_2_ip }}" }
+
+- name: copy sql script for master
+  template: src=setmaster.sh.j2 dest=/tmp/setmaster.sh
+
+- name: copy sql script for slave
+  template: src=setslave.sh.j2 dest=/tmp/setslave.sh
+
+
+- name: copy getlogfile and getlogpos script
+  copy: src=getfilepos.sh dest=/tmp/getfilepos.sh
+
+
+# Network
+- name: Create Mysql bridge network
+  docker_network:
+    name: "{{ bridge_name }}"
+    ipam_options:
+      subnet: "{{ bridge_subnet }}"
+      gateway: "{{ bridge_gateway }}"
+
+- name: Start Mysql Master container
+  docker_container:
+    name: "{{ master_name }}"
+    recreate: yes
+    image: "mysql:8.0.18"
+    ports:
+      - "3307:3306"
+    networks:
+      - name: "{{ bridge_name }}"
+        ipv4_address: "{{ container_1_ip }}"
+    env:
+       MYSQL_ROOT_PASSWORD: "{{ ROOT_PASS }}"
+    volumes:
+      - /tmp/my.cnf-{{ master_name }}:/etc/mysql/my.cnf
+      - /home/ansible/mysql-master:/var/lib/mysql
+      - /tmp/setmaster.sh:/tmp/setmaster.sh
+      - share:/tmp/share
+      - /tmp/getfilepos.sh:/tmp/getfilepos.sh
+
+        # shell: "sh /tmp/setmaster.sh"
+        #shell: "cat master_status.txt | awk '{print $1}'"
+        #register: mas_log_file
+        #shell: "cat master_status.txt | awk '{print $2}'"
+        #register: pos_log_file
+        # command: ["docker","exec","my-master","sh","/tmp/setmaster.sh"]
+    
+- name: Start Mysql Slave container
+  docker_container:
+    name: "{{ slave_name }}"
+    recreate: yes
+    image: "mysql:8.0.18"
+    ports:
+      - "3308:3306"
+    networks:
+      - name: "{{ bridge_name }}"
+        ipv4_address: "{{ container_2_ip }}"
+    env:
+       MYSQL_ROOT_PASSWORD: "{{ ROOT_PASS }}"
+    volumes:
+      - /tmp/my.cnf-{{ slave_name }}:/etc/mysql/my.cnf
+      - /home/ansible/mysql-slave:/var/lib/mysql
+      - share:/tmp/share
+      - /tmp/setslave.sh:/tmp/setslave.sh
+
+#- name: Run Master script
+#  docker_container:
+#    name: "{{ master_name }}"
+#    command: ["sh","/tmp/setmaster.sh"]
+#  ignore_errors: yes
+
+- name: execute sql scripts
+  shell: |
+    docker exec {{ master_name }} bash /tmp/setmaster.sh
+    docker exec {{ master_name }} bash /tmp/getfilepos.sh
+    docker exec {{ slave_name }} bash /tmp/setslave.sh

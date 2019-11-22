@@ -1,0 +1,6 @@
+
+
+CREATE USER 'replicauser'@'%' IDENTIFIED WITH mysql_native_password BY 'replicapass';
+GRANT ALL PRIVILEGES ON *.*  TO 'replicauser'@'%';
+
+SHOW MASTER STATUS;
