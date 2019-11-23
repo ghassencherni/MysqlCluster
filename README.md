@@ -1,6 +1,6 @@
 # mysqlcluster
 Build Mysql Master and Slave based on Ansible Playbook which deploys MySQL master and slave in Docker containers.
-
+The cluster configuration based on this document: https://devopscube.com/setup-mysql-master-slave-replication/
 
 ## Requirements
 
