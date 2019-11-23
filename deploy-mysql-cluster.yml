@@ -1,6 +1,7 @@
 ---
-- hosts: nodes
+- hosts: all
   become: yes
   roles:
-     #- geerlingguy.docker
+    #- geerlingguy.docker
+    - ansible-role-docker 
     - MysqlCluster

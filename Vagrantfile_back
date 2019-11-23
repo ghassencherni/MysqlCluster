@@ -1,0 +1,31 @@
+VAGRANTFILE_API_VERSION = "2"
+ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+ #config.vm.box = "williamyeh/ubuntu-trusty64-docker"
+ config.vm.box = "jasonc/centos7-32bit"
+ #config.vm.box = "centos-7"
+ config.vm.hostname = "Node1"
+ config.vm.provision :ansible do |ansible|
+
+ ansible.playbook = "deploy-mysql-cluster.yml"
+ ansible.inventory_path= "hosts"
+ ansible.limit = 'all'
+ #ansible.sudo = true
+ #ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+ #ansible.raw_arguments  = "--private-key=~/.vagrant.d/insecure_private_key"
+ ansible.host_key_checking = false
+
+ # using a specific IP.
+ config.vm.network :private_network, ip: "10.0.0.2"
+
+ config.vm.provider :virtualbox do |vb|
+
+ vb.customize ["modifyvm", :id, "--memory", "1024"]
+
+ # these 2 commands massively speed up DNS resolution, which means outbound
+ # connections don't take forever (eg the WP admin dashboard and update page)
+ vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+ vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+ 
+ end
+ end
+ end

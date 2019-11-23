@@ -48,7 +48,7 @@
 
 #Pause to start mysql
 - pause:
-    seconds: 10
+    seconds: 15
 
 - name: execute set master scripts
   shell: |
@@ -90,7 +90,7 @@
 
 # Pause to start mysql
 - pause:
-     seconds: 10
+     seconds: 15
 
 - name: execute sql scripts
   shell: |
