@@ -43,18 +43,33 @@ mysql> show databases;
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
+
+
 Adding new Bridge network configuration and use it with the cluster due to an issue with the default bridge 
+ 
     bridge_name: "mysql_bridge"
+ 
     bridge_subnet: "172.20.0.0/16"
+ 
     bridge_gateway: "172.20.0.1"
 
+
+
 Container 1 & 2 ip address, 
+ 
     container_1_ip: "172.20.0.2"  used for the master
+ 
     container_2_ip: "172.20.0.3"  used for the slave
 
+
+
 Containers names ( used as tag for templates )
+    
     master_name: "my-master"
+    
     slave_name: "my-slave"
+
+
 
 The default password for the root MYSQL, used to configure the replication and to test the deployement 
     ROOT_PASS: "ghassen" 
