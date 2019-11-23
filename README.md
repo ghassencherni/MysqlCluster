@@ -4,7 +4,7 @@ Build Mysql Master and Slave based on Ansible Playbook which deploys MySQL maste
 
 ## Requirements
 
-- Vagrant and Virtualbox must be installed on your host ( phisical host as Node are build from 64bit image ) 
+- Vagrant and Virtualbox must be installed on your host ( physical host as Node are build from 64bit image ) 
 
 ## Getting Started
 
