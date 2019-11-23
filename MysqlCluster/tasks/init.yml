@@ -41,14 +41,15 @@
         ipv4_address: "{{ container_1_ip }}"
     env:
        MYSQL_ROOT_PASSWORD: "{{ ROOT_PASS }}"
+       # MYSQL_ROOT_HOST: "%"
     volumes:
       - /tmp/my.cnf-{{ master_name }}:/etc/mysql/my.cnf
       - /home/ansible/mysql-master:/var/lib/mysql
       - /tmp/setmaster.sh:/tmp/setmaster.sh
 
-#Pause to start mysql
-- pause:
-    seconds: 15
+- name: Whaiing to start mysql ... (20s) 
+  pause:
+    seconds: 20
 
 - name: execute set master scripts
   shell: |
@@ -83,14 +84,15 @@
        MYSQL_ROOT_PASSWORD: "{{ ROOT_PASS }}"
        MAS_LOG_FILE: "{{ LOG_FILE.stdout }}"
        MAS_LOG_POS: "{{ LOG_POS.stdout }}"
+       #  MYSQL_ROOT_HOST: "%"
     volumes:
       - /tmp/my.cnf-{{ slave_name }}:/etc/mysql/my.cnf
       - /home/ansible/mysql-slave:/var/lib/mysql
       - /tmp/setslave.sh:/tmp/setslave.sh
 
-# Pause to start mysql
-- pause:
-     seconds: 15
+- name: Waiting to start mysql ... (20s)
+  pause:
+    seconds: 20
 
 - name: execute sql scripts
   shell: |

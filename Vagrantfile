@@ -6,9 +6,17 @@ VAGRANTFILE_API_VERSION = "2"
  config.vm.hostname = "Node1"
 
  config.vm.provision "shell", inline: <<-SHELL
-    sudo yum install epel-release
-    sudo yum install python-pip
-    sudo pip install --ignore-installed docker-py
+    sudo yum update
+    yum -y install python2-pip
+    sudo pip install --upgrade pip
+    pip install docker-py
+    sudo yum -y install docker
+     
+    #Open mysql master and slave ports
+    firewall-cmd --zone=public --add-port=3308/tcp --permanent
+    firewall-cmd --zone=public --add-port=3307/tcp --permanent
+    firewall-cmd --reload
+    
     SHELL
 
  config.vm.provision :ansible do |ansible|
@@ -27,9 +35,9 @@ VAGRANTFILE_API_VERSION = "2"
  config.vm.network :private_network, ip: "10.0.0.3"
  
  # Port forwording for mysql master
- config.vm.network "forwarded_port", guest: 3307, host: 3307, host_ip: "127.0.0.1"
+ config.vm.network "forwarded_port", guest: 3307, host: 3307
  # Port forwording for mysql slave
- config.vm.network "forwarded_port", guest: 3308, host: 3308, host_ip: "127.0.0.1"
+ config.vm.network "forwarded_port", guest: 3308, host: 3308
 
  config.vm.provider :virtualbox do |vb|
 

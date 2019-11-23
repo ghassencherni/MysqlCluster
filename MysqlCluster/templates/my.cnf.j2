@@ -5,7 +5,9 @@ datadir         = /var/lib/mysql
 secure-file-priv= NULL
 symbolic-links=0
 
-bind-address           = {{ item.ip }}
+#bind-address           = {{ item.ip }}
+bind-address           = 0.0.0.0
+
 server-id              = {{ item.server_id }}
 log_bin                = mysql-bin
 
