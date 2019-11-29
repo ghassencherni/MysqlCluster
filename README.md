@@ -28,7 +28,7 @@ Connect to mysql master from your host and using the root:
    1. Run the command:
 mysql --protocol=tcp --port=3307 --user=root -pghassen
     
-    2. Create new database “test”:
+    2. Create new database “mydatabase”:
 mysql> create database mydatabase;
 
     3. Now connect to the slave server :
